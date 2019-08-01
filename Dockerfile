@@ -1,15 +1,16 @@
-FROM frolvlad/alpine-glibc
+FROM adoptopenjdk/openjdk12:alpine
 
-LABEL maintainer="k1LoW <k1lowxb@gmail.com>" \
-      description="Pandoc for Japanese based on Alpine Linux."
+LABEL maintainer="y.sogabe <y.sogabe@gmail.com>" \
+      description="Pandoc for Japanese based on Alpine Linux. with PlantUML, pandocfilter"
 
+ENV LANG=C.UTF-8
 # Install Tex Live
 ENV TEXLIVE_VERSION 2019
-ENV PATH /usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linuxmusl:$PATH
+ENV PATH /usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linux:$PATH
 
 RUN apk --no-cache add perl wget xz tar fontconfig-dev \
  && mkdir -p /tmp/src/install-tl-unx \
- && wget -qO- ftp://tug.org/texlive/historic/$TEXLIVE_VERSION/install-tl-unx.tar.gz | \
+ && wget -qO-  http://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz | \
     tar -xz -C /tmp/src/install-tl-unx --strip-components=1 \
  && printf "%s\n" \
       "selected_scheme scheme-basic" \
@@ -18,7 +19,7 @@ RUN apk --no-cache add perl wget xz tar fontconfig-dev \
       > /tmp/src/install-tl-unx/texlive.profile \
  && /tmp/src/install-tl-unx/install-tl \
       --profile=/tmp/src/install-tl-unx/texlive.profile \
- && tlmgr option repository http://mirror.ctan.org/systems/texlive/tlnet \
+ && tlmgr option repository http://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet \
  && tlmgr update --self && tlmgr update --all \
  && tlmgr install \
       collection-basic collection-latex \
@@ -51,15 +52,40 @@ RUN apk add --no-cache \
  && curl -fsSL "$PANDOC_DOWNLOAD_URL" -o pandoc.tar.gz \
  && echo "$PANDOC_DOWNLOAD_SHA512  pandoc.tar.gz" | sha512sum -c - \
  && tar -xzf pandoc.tar.gz && rm -f pandoc.tar.gz \
- && ( cd pandoc-$PANDOC_VERSION && cabal update && cabal install --only-dependencies \
-    && cabal configure --prefix=$PANDOC_ROOT \
-    && cabal build \
-    && cabal copy \
-    && cd .. ) \
+ && cd pandoc-$PANDOC_VERSION && cabal update && cabal install --only-dependencies \
+ && cabal configure --prefix=$PANDOC_ROOT \
+ && cabal build \
+ && cabal copy \
+ && cd /pandoc-build \
  && rm -Rf pandoc-$PANDOC_VERSION/ \
  && apk del --purge build-dependencies \
  && rm -Rf /root/.cabal/ /root/.ghc/ \
  && cd / && rm -Rf /pandoc-build
+
+# Install plantuml
+ENV PLANTUML_VERSION 1.2019.5
+RUN apk add --no-cache \
+    curl \
+    graphviz \
+    ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family \
+ && mkdir -p /usr/share/plantuml \
+ && curl -o /usr/share/plantuml/plantuml.jar -JLsS \
+    http://sourceforge.net/projects/plantuml/files/plantuml.${PLANTUML_VERSION}.jar/download \
+ && ln -s /usr/local/texlive/2019/texmf-dist/fonts/truetype/public/ipaex /usr/share/fonts/ipa \
+ && fc-cache -fv
+
+# Install pandocfilters
+RUN apk --no-cache add \
+    git \
+    python2 \
+ && cd /tmp \
+ && git clone https://github.com/jgm/pandocfilters.git \
+ && cd /tmp/pandocfilters \
+ && python setup.py install \
+ && sed 's/plantuml.jar/\/usr\/share\/plantuml\/plantuml.jar/' examples/plantuml.py \ 
+     > /usr/share/plantuml/plantuml.py \
+ && sed -i.bk 's/latex=\"eps\"/latex=\"png\"/' /usr/share/plantuml/plantuml.py \
+ && chmod +x /usr/share/plantuml/plantuml.py
 
 VOLUME ["/workspace", "/root/.pandoc/templates"]
 WORKDIR /workspace
