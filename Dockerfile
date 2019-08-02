@@ -72,7 +72,8 @@ RUN apk add --no-cache \
  && curl -o /usr/share/plantuml/plantuml.jar -JLsS \
     http://sourceforge.net/projects/plantuml/files/plantuml.${PLANTUML_VERSION}.jar/download \
  && ln -s /usr/local/texlive/2019/texmf-dist/fonts/truetype/public/ipaex /usr/share/fonts/ipa \
- && fc-cache -fv
+ && fc-cache -fv \
+ && apk del --purge curl
 
 # Install pandocfilters
 RUN apk --no-cache add \
@@ -85,7 +86,10 @@ RUN apk --no-cache add \
  && sed 's/plantuml.jar/\/usr\/share\/plantuml\/plantuml.jar/' examples/plantuml.py \ 
      > /usr/share/plantuml/plantuml.py \
  && sed -i.bk 's/latex=\"eps\"/latex=\"png\"/' /usr/share/plantuml/plantuml.py \
- && chmod +x /usr/share/plantuml/plantuml.py
+ && rm -rf /usr/share/plantuml/plantuml.py.bk \
+ && rm -rf /tmp/pandocfilters \
+ && chmod +x /usr/share/plantuml/plantuml.py \
+ && apk del --purge git
 
 VOLUME ["/workspace", "/root/.pandoc/templates"]
 WORKDIR /workspace
