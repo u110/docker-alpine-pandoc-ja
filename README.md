@@ -1,6 +1,4 @@
-# alpine-pandoc-ja 
-
-<!-- [![Docker Automated build](https://img.shields.io/docker/automated/k1low/alpine-pandoc-ja.svg?style=flat-square)](https://hub.docker.com/r/k1low/alpine-pandoc-ja/) [![Docker Automated build](https://img.shields.io/docker/build/k1low/alpine-pandoc-ja.svg?style=flat-square)](https://hub.docker.com/r/k1low/alpine-pandoc-ja/builds/) [![GitHub release](https://img.shields.io/github/release/k1low/docker-alpine-pandoc-ja.svg?style=flat-square)](https://github.com/k1LoW/docker-alpine-pandoc-ja/releases) -->
+# alpine-pandoc-ja ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/ysogabe/alpine-pandoc-ja) ![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/ysogabe/alpine-pandoc-ja)
 
 Pandoc for Japanese based on Alpine Linux. 
 Add on PlantUML and pandocfilter(plantuml.py only)
