@@ -37,6 +37,7 @@ ENV PANDOC_DOWNLOAD_SHA512 4b3a21cf76777ed269bf7c13fd09ab1d5c97ed21ec9f02bff95fd
 ENV PANDOC_ROOT /usr/local/pandoc
 ENV PATH $PATH:$PANDOC_ROOT/bin
 
+# See https://github.com/lierdakil/pandoc-crossref 
 RUN apk add --no-cache \
     gmp \
     libffi \
@@ -48,21 +49,13 @@ RUN apk add --no-cache \
     musl-dev \
     zlib-dev \
     curl \
- && mkdir -p /pandoc-build && cd /pandoc-build \
- && curl -fsSL "$PANDOC_DOWNLOAD_URL" -o pandoc.tar.gz \
- && echo "$PANDOC_DOWNLOAD_SHA512  pandoc.tar.gz" | sha512sum -c - \
- && tar -xzf pandoc.tar.gz && rm -f pandoc.tar.gz \
- && cd pandoc-$PANDOC_VERSION && cabal update && cabal install --only-dependencies \
- && cabal configure --prefix=$PANDOC_ROOT \
- && cabal build \
- && cabal copy \
- && cd /pandoc-build \
- && rm -Rf pandoc-$PANDOC_VERSION/ \
- && apk del --purge build-dependencies \
- && rm -Rf /root/.cabal/ /root/.ghc/ \
- && cd / && rm -Rf /pandoc-build
+ && cabal new-update \
+ && cabal new-install --global \
+    pandoc pandoc-crossref pandoc-citeproc \
+ && cp /root/.cabal/bin/* /usr/local/bin \
+ && apk del --purge build-dependencies
 
-# Install plantuml
+ # Install plantuml
 ENV PLANTUML_VERSION 1.2019.5
 RUN apk add --no-cache \
     curl \
