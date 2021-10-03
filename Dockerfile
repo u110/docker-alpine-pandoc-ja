@@ -20,6 +20,8 @@ RUN apk --no-cache add perl wget xz tar fontconfig-dev \
  && /tmp/src/install-tl-unx/install-tl \
       --profile=/tmp/src/install-tl-unx/texlive.profile \
  && tlmgr option repository http://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet \
+ && wget http://mirror.ctan.org/systems/texlive/tlnet/update-tlmgr-latest.sh \
+ && chmod +x update-tlmgr-latest.sh \
  && tlmgr update --self && tlmgr update --all \
  && tlmgr install \
       collection-basic collection-latex \
