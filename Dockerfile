@@ -6,7 +6,7 @@ LABEL maintainer="y.sogabe <y.sogabe@gmail.com>" \
 ENV LANG=C.UTF-8
 # Install Tex Live
 ENV TEXLIVE_VERSION 2021
-ENV PATH /usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linux:$PATH
+ENV PATH /usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linuxmusl:$PATH
 
 RUN apk --no-cache add perl wget xz tar fontconfig-dev \
  && mkdir -p /tmp/src/install-tl-unx \
