@@ -56,7 +56,7 @@ RUN apk add --no-cache \
  && apk del --purge build-dependencies
 
  # Install plantuml
-ENV PLANTUML_VERSION 1.2019.5
+ENV PLANTUML_VERSION 1.2021.11
 RUN apk add --no-cache \
     curl \
     graphviz \
