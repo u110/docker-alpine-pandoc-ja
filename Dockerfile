@@ -5,8 +5,8 @@ LABEL maintainer="y.sogabe <y.sogabe@gmail.com>" \
 
 ENV LANG=C.UTF-8
 # Install Tex Live
-ENV TEXLIVE_VERSION 2019
-ENV PATH /usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linux:$PATH
+ENV TEXLIVE_VERSION 2021
+ENV PATH /usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linuxmusl:$PATH
 
 RUN apk --no-cache add perl wget xz tar fontconfig-dev \
  && mkdir -p /tmp/src/install-tl-unx \
@@ -20,6 +20,8 @@ RUN apk --no-cache add perl wget xz tar fontconfig-dev \
  && /tmp/src/install-tl-unx/install-tl \
       --profile=/tmp/src/install-tl-unx/texlive.profile \
  && tlmgr option repository http://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet \
+ && wget http://mirror.ctan.org/systems/texlive/tlnet/update-tlmgr-latest.sh \
+ && chmod +x update-tlmgr-latest.sh \
  && tlmgr update --self && tlmgr update --all \
  && tlmgr install \
       collection-basic collection-latex \
@@ -56,7 +58,7 @@ RUN apk add --no-cache \
  && apk del --purge build-dependencies
 
  # Install plantuml
-ENV PLANTUML_VERSION 1.2019.5
+ENV PLANTUML_VERSION 1.2021.11
 RUN apk add --no-cache \
     curl \
     graphviz \
